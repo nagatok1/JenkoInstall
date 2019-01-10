@@ -1,0 +1,16 @@
+#!/bin/bash
+PROJECT="spring-boot-hello-world"
+mvn clean package
+INSTALL_FOLDER="${JENKINS_HOME}/${PROJECT}"
+
+PID_FILE="${INSTALL_FOLDER}/PID"
+OLD_PID=${cat ${PID_FILE}}
+kill -9 ${OLD_PID}
+mkdir -p ${INSTALL_FOLDER}
+rm -rf ${INSTALL_FOLDER}/*
+
+cp target/hello-world*.jar ${INSTALL_FOLDER}/${PROJECT}.jar
+
+BUILD_ID=dontKillMe java -jar ${INSTALL_FOLDER}/${PROJECT}.jar 2>&1 &
+echo $! > ${PID_FILE}
+disown
